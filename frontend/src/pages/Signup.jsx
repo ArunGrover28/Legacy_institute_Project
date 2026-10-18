@@ -24,30 +24,44 @@ function Signup() {
   };
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    setError("");
-    setSuccess("");
-    setLoading(true);
+  e.preventDefault();
+  setError("");
+  setSuccess("");
 
-    try {
-      const response = await api.post("/auth/signup", formData);
+  const email = formData.email.trim();
 
-      setSuccess(
-        response.data.message || "Account created successfully!"
-      );
+  const emailPattern =
+    /^[A-Za-z0-9._%+-]+@[A-Za-z0-9-]+(\.[A-Za-z0-9-]+)+$/;
 
-      setTimeout(() => {
-        navigate("/login");
-      }, 1000);
-    } catch (err) {
-      setError(
-        err.response?.data?.message ||
-          "Unable to create your account. Please try again."
-      );
-    } finally {
-      setLoading(false);
-    }
-  };
+  if (!emailPattern.test(email)) {
+    setError("Please enter a valid email address, such as arun@gmail.com.");
+    return;
+  }
+
+  setLoading(true);
+
+  try {
+    const response = await api.post("/auth/signup", {
+      ...formData,
+      email,
+    });
+
+    setSuccess(
+      response.data.message || "Account created successfully!"
+    );
+
+    setTimeout(() => {
+      navigate("/login");
+    }, 1000);
+  } catch (err) {
+    setError(
+      err.response?.data?.message ||
+        "Unable to create your account. Please try again."
+    );
+  } finally {
+    setLoading(false);
+  }
+};
 
   return (
     <div className="min-h-screen bg-slate-50 text-slate-900">
@@ -177,16 +191,18 @@ function Signup() {
                   Email address
                 </label>
                 <input
-                  id="email"
-                  name="email"
-                  type="email"
-                  autoComplete="email"
-                  placeholder="you@example.com"
-                  value={formData.email}
-                  onChange={handleChange}
-                  required
-                  className="w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10"
-                />
+                id="email"
+                name="email"
+                type="email"
+                autoComplete="email"
+                placeholder="you@example.com"
+                value={formData.email}
+                onChange={handleChange}
+                pattern="[A-Za-z0-9._%+-]+@[A-Za-z0-9-]+(\.[A-Za-z0-9-]+)+"
+                title="Enter a valid email address, such as arun@gmail.com"
+                required
+                className="w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10"
+              />
               </div>
 
               <div>
